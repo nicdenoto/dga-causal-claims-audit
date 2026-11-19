@@ -1,0 +1,6 @@
+[
+ {"id": "Victora", "measure": "RR", "est": 3.9, "lo": 1.8, "hi": 8.7,
+  "targets": [1], "exposure": "formula feeding", "outcome": "respiratory death"},
+ {"id": "Huybrechts", "measure": "RR", "est": 1.06, "lo": 0.93, "hi": 1.22,
+  "targets": [1, 1.2], "exposure": "antidepressant use in pregnancy", "outcome": "infant cardiac defects"}
+]
