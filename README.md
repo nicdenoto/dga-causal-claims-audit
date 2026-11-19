@@ -1,130 +1,156 @@
 # DGA Causal-Claims Audit
 
-A semi-automated pipeline for auditing the causal claims made in public-health
-nutrition guidance, applied to *The Scientific Foundation for the Dietary
-Guidelines for Americans, 2025–2030* and its appendices.
+I'm building a research pipeline that checks whether the certainty the *2025–2030 Dietary Guidelines for Americans* (DGA) asserts for its causal claims matches the evidence it cites. It combines LLM-applied appraisal frameworks with Python code that checks the LLM's work instead of trusting it.
 
-**Core research question.** Does the certainty a guidance document *asserts* for a
-causal claim match the *evidence structure* that actually supports it? The project
-is not an attempt to decide whether a recommendation is correct; it asks whether
-the confidence placed behind it is earned by the evidence on record.
+## Why
 
-**Constructive aim.** Where certainty outruns support, the audit does not stop at
-naming the gap. For each such claim it supplies a concrete piece of *existing*
-contrary evidence — mechanistic or anthropological — that runs against the claim
-as stated. The goal is to supplement with evidence the guidance omitted, not to
-propose new studies.
+Dietary guidance often states its recommendations with high confidence. I'm not trying to decide whether a recommendation is right. I'm asking a narrower question: **is the confidence behind each claim earned by the evidence on record?** When it isn't, I try to show exactly where the gap is, and to point to existing evidence the guidance left out.
 
-Claude Artifact of Corpus Stage Outline: https://claude.ai/code/artifact/4dbb15b8-9fc4-4be8-8635-f866c4499f15
+My governing framework is the **Russo–Williamson Thesis** (the EBM+ view). It holds that a causal claim needs two kinds of support:
 
----
+- a **difference-making** leg: trials and cohort studies showing that the outcome varies with the cause;
+- a **mechanistic** leg: an evidenced pathway.
 
-## Evaluative framework
+I check the two legs separately. On top of that I apply standard appraisal tools: GRADE, the Bradford Hill criteria, the E-value and quantitative bias analysis, plus risk-of-bias and reporting instruments where the study design calls for them.
 
-The backbone is the **Russo–Williamson Thesis (RWT)**: a causal claim is
-established only when it carries both a **difference-making** leg (RCTs, cohort
-studies, clinical observation — does the outcome vary with the cause) *and* a
-**mechanistic** leg (a plausible, evidenced physiological pathway). Each case
-analysis checks the two legs separately, because a claim can be well-supported on
-one and thin on the other, and neither leg alone establishes causation.
+## How it works
 
-RWT sits alongside a supporting appraisal apparatus — GRADE, the Bradford Hill
-criteria, the Cochrane risk-of-bias tools (RoB 2, ROBINS-I), STROBE, the E-value,
-and quantitative bias analysis (QBA), with ROBIS / AMSTAR-2 / CONSORT used where
-design-specific evaluation is warranted. See `paper/02-methodology.md` and
-`src/README.md` for the full treatment.
+The pipeline has six stages. Status is marked honestly: **working** means code in this repo you can run today.
 
-Four of these frameworks — GRADE, the Bradford Hill criteria, the E-value and
-QBA — are applied by an LLM that is first calibrated against published
-gold-standard examples (see "LLM calibration" in `paper/02-methodology.md`).
-Calibration runs one framework at a time. The E-value is the prototype and is in
-progress; the other three follow once it has been run all the way through. The
-prompts under test are versioned in `src/prompts/`.
+```
+DGA report + appendices
+        │
+1. Claim selection ............ by hand, on purpose (I don't let a model decide what a claim is)
+2. Reference acquisition ...... done by hand with LLM help so far; no script in this repo yet
+3. Evidence records ........... WORKING: schema + validator (src/stage3_evidence_hierarchy.py)
+4. Framework appraisal ........ LLM applies the frameworks; WORKING verification layer (src/stage4/)
+5. Statistical evaluation ..... open design question, not started
+6. Gap identification ......... done by hand so far
+```
 
-## Provenance-tier discipline (non-negotiable)
+- **Stage 3** turns each piece of evidence behind a claim into a structured `EvidenceRecord`, defined in `src/schema/evidence-record.md`. Each record carries the source document and page, whether the number was reported by the source or derived from it, and a provenance tier. The validator checks 11 of the schema's 13 rules; the other two need Stage 4 appraisal records or the source PDFs, so they can't be checked from the records alone. For the whole-grains claim (WG-01) there are 28 records, and they validate with 0 errors.
+- **Stage 4** is where an LLM applies each framework to published, worked examples. Before I trust it on the guidelines, it has to reproduce those examples correctly (see "Verification" below). The E-value is the first framework I'm calibrating; GRADE, Bradford Hill and QBA follow once it is finished.
 
-Every factual claim in this project is tagged by how it is known. The tiers are
-never conflated — conflating them is treated as a methodological error, not a
-style issue:
+## Verification: how the code checks the LLM
 
-- **[T1] primary-verified** — checked directly against a primary document
-  (the DGA report, an appendix, an original trial report).
-- **[T2] secondary-sourced** — obtained via search or a secondary/AI-research
-  pass; must be verified against the primary source before final citation.
-- **[STRUCTURE] structure-inferred** — inferred from the shape of the document
-  or evidence base rather than stated outright.
+Early on, I ran the model on its own (prompt versions v1–v4). It reasoned about the framework well, but it was unreliable at bookkeeping: it skipped some values, made small changes to quotations, and reported checks it hadn't actually done. So I split the work. **The model does the judgment; code does the mechanics.**
 
-Any new prose written into this repo is expected to carry the same tags.
+1. **The model fills a structured table, and an embedded calculator computes every number.** For each estimate, the model enters a JSON row: the measure, the estimate, the CI and the targets. It then runs `evalue_calc.py`, which is embedded in the prompt word for word. The model is told never to compute E-values by hand. From prompt v11, the calculator also prints the full interpretation sentence for every result, and the model copies it unchanged.
+2. **`validate_evalue.py` re-runs every row and compares it with an answer key** that I built from the source papers. The key stays out of the repo and is never shown to the model. The validator flags any rows that are missing, inputs that are wrong, a wrong conversion path (for example treating an odds ratio as rare when the outcome is common), duplicate entries, and E-value-like numbers in the prose that the calculator never produced. A D4 screen also flags any example with no complete interpretation sentence. It's a heuristic, so I read its flags rather than treating them as scores.
+3. **`verify_quotes.py` checks every quotation against the source PDF.** Each quotation must appear word for word, and it must be on the page the model cited for it. If two quotations share one citation in the same sentence, both are checked against that page. For example, when I ran it on a sentence from one calibration output, it printed:
+   ```
+   PAGE cited [7] (shared citation), found [8]: is more closely analogous to Rosenbaum's design sensitivity
+   ```
+4. **I read every output in full** and score it against a written rubric. From v5 on, each prompt version is run 3 times on each of 3 source papers, in fresh isolated chats, and I report how reliable it is across runs, not just its best run.
 
-## The two-layer audit
+Every prompt version and the reason for each change are in `src/prompts/` (version log in `src/prompts/README.md`, unified diffs in `src/prompts/diffs/`). The calibration results so far are recorded there too, including the version that made things worse (v10).
 
-The DGA corpus is read as two layers, and a claim can fail at either
-independently:
+## Quick start
 
-- **Front-end** — the main report / Scientific Foundation: the GRADE-labeled
-  claims a policymaker actually reads.
-- **Back-end** — the appendices: the systematic and umbrella reviews, evidence
-  tables, and ROBIS/GRADE assessments that are supposed to support those claims.
+You need Python 3.10 or newer. `verify_quotes.py` also needs `pdftotext` (poppler) and a source PDF. The PDFs are copyrighted, so they aren't in the repo.
 
----
+```bash
+git clone https://github.com/nicdenoto/United-States-Food-Pyramid.git
+cd United-States-Food-Pyramid
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r src/requirements.txt
+
+# 1. Validate the 28 whole-grain evidence records (exit code 0 = clean)
+python src/stage3_evidence_hierarchy.py
+
+# 2. Run the calculator's test suite (published answer-key values, edge cases)
+cd src/stage4
+python test_evalue_calc.py
+
+# 3. Run the calculator on two examples from VanderWeele & Ding (2017)
+python run_example.py example_table.json
+```
+
+The code doesn't need any API keys: no stage calls an LLM API. I run the calibration chats myself in a locked-down claude.ai project (details below).
+
+## Example output
+
+These are real outputs from the commands above.
+
+Stage 3 validator (first lines):
+```
+28 records, 2 claim(s), 0 error(s), 0 note(s)
+
+WG-01a (26 record(s)):
+  WG01-EV-001 [SOURCE_REPORTED, T1] DIFFERENCE_MAKING -- CITED_DIRECTLY: all-cause mortality, high vs low whole-grain intake
+  WG01-EV-003 [SOURCE_REPORTED, T1] DIFFERENCE_MAKING -- CITED_DIRECTLY: cardiovascular disease, high vs low whole-grain intake
+```
+
+Calculator on the Huybrechts example, where the confidence interval already contains the null (the long note column is cut short here):
+```
+line | RR | CI on RR scale | target | E point | E CI | limit | note
+Huybrechts -> 1 (null) | 1.060 | (0.930, 1.220) | 1 | 1.312 | 1.000 | target inside CI | CI E-value is 1: ...
+
+[Huybrechts -> 1 (null), estimate] With an observed risk ratio of 1.06, an unmeasured confounder that was associated with both antidepressant use in pregnancy and infant cardiac defects by a risk ratio of 1.31-fold each, above and beyond the measured confounders, could explain away the estimate, but weaker confounding could not.
+```
+
+## Project status and limitations
+
+**Done**
+- The claim inventory (`corpus/claim-inventory.md`). The whole-grains claim is verified against primary sources. The first-pass entries for five more food groups are drawn from the appendix text only and are not yet verified.
+- The Stage 3 schema and validator, with 28 validated whole-grain evidence records.
+- The E-value verification layer, with 33 passing tests.
+- Eleven prompt versions. Ten have been run on the calibration set; v6 was replaced before it was used.
+
+**In progress**
+- E-value calibration. No prompt version has passed all three gates yet. The current round tests v11 side by side with v9 as a control, in the same sitting, so that a change in the model can be told apart from a change in the prompt.
+- Paper drafts (`paper/`): the introduction and methodology.
+
+**Not started or still open**
+- GRADE, Bradford Hill and QBA calibration.
+- Stage 5, whose statistical design is still undecided.
+- A reference-acquisition script. Stages 1, 2, 5 and 6 are stubs in `src/`.
+- After whole grains, the next claims to run through the pipeline will be vegetables, then saturated fat.
+
+**Known limitations**
+- The LLM step is run by hand in a chat interface, not through an API. That keeps the model's context tightly controlled (prompt plus one attached paper, with no web search, memory or past chats), but it means the runs aren't scripted.
+- The model is Claude Sonnet 5 at medium reasoning effort, the only setup available to me without cost.
+- Some of the scoring is my own judgment against a written rubric. To keep it honest I count borderline items as failures, and I log every call in the scoring worksheets.
+- With 3 runs per paper, small differences between prompt versions aren't statistically meaningful.
 
 ## Repository layout
 
 ```
-.
-├── README.md                     ← you are here
-├── STATUS.md                     ← current state + open decisions (local only — gitignored)
-├── paper/                        ← the manuscript
-│   ├── 01-introduction-and-background.md
-│   ├── 02-methodology.md         (RWT-as-operationalizing-lens; LLM calibration)
-│   ├── 03-theoretical-framework.md   (not yet written; gitignored until drafted)
-│   ├── outline-and-timeline.md       (gitignored — internal planning doc)
-│   └── sources/
-│       └── methodology-proposal-gpt-archive.md   (recovered supervisor proposal)
-├── docs/                         ← project briefing / onboarding (local only — gitignored)
-│   ├── agent-context-pack.md     (full standalone briefing — read first)
-│   ├── handoff-current-state.md
-│   └── task-ledger-snapshot.md   (static export of the live ledger)
-├── src/                          ← the six-stage pipeline (stubs, except the Stage 3 validator — see src/README.md)
-│   ├── README.md
-│   ├── stage1_organization_and_claim_selection.py
-│   ├── stage2_reference_acquirer.py
-│   ├── stage3_evidence_hierarchy.py
-│   ├── stage4_framework_appraisal.py
-│   ├── stage5_statistical_evaluation.py   (form undetermined — open)
-│   ├── stage6_gap_identification.py
-│   ├── prompts/                  (versioned calibration + live-analysis prompts; E-value v1, v2 — see its README)
-│   ├── schema/evidence-record.md (Stage 3 EvidenceRecord schema; §1–§11 frozen at revision 7)
-│   └── requirements.txt
-├── corpus/
-│   ├── dga/appendices.md         (DGA appendices — US federal work, public domain)
-│   ├── claim-inventory.md        (WG-01 narrative entry [T1]; first-pass [T2]/[STRUCTURE] entries for 5 more food groups — 4.1, 4.2, 4.6/4.7, 4.9, 4.10)
-│   ├── stage3_evidence_records/WG-01.md   (28 validated EvidenceRecords — the authoritative WG-01 record)
-│   ├── reference-library/        (methodology PDFs — gitignored; see its README)
-│   └── primary_studies/          (primary-study PDFs backing claim effect estimates — gitignored; see its README)
-└── notes/                        ← raw working notes the drafts were built from
+src/
+  stage3_evidence_hierarchy.py   Stage 3 validator (working)
+  schema/evidence-record.md      EvidenceRecord specification
+  stage4/                        E-value calculator, validator, quote verifier, tests (working)
+  prompts/                       every calibration prompt version, version log, diffs
+  stage1_…, stage2_…, stage4_…, stage5_…, stage6_…   stubs for stages not implemented here
+corpus/
+  dga/                           the DGA front-end report and appendices (U.S. federal work, public domain)
+  claim-inventory.md             the claims under audit
+  stage3_evidence_records/       validated EvidenceRecords (WG-01)
+  reference-library/, primary_studies/   citation manifests only (the PDFs are copyrighted, not tracked)
+paper/                           drafts of the paper's introduction and methodology
+archive/notes/                   my raw early working notes, kept for provenance
 ```
 
-## A note on the code
+## Provenance tags
 
-The pipeline scripts under `src/` are **structured stubs**, not the working
-implementation — except `stage3_evidence_hierarchy.py`, which is a working
-validator for the Stage 3 EvidenceRecord schema (`src/schema/evidence-record.md`). The live code lives in the local development environment; drop it
-into the matching stage files, keeping the six-stage boundaries and the provenance
-control intact. `src/README.md` describes what each stage is responsible for and
-which stage is still methodologically open (stage 5, statistical evaluation).
+Every factual claim in the corpus and the drafts is tagged by how I know it:
 
-## A note on the corpus
+- **[T1]** I verified it against the primary document.
+- **[T2]** It comes from a secondary source or search, and is not yet verified.
+- **[STRUCTURE]** I inferred it from the structure of the document.
 
-The **DGA appendices** (`corpus/dga/appendices.md`) are a work of the U.S. federal
-government and are in the public domain, so they are tracked here. The
-**methodology reference PDFs** under `corpus/reference-library/` are copyrighted
-published papers; they are present locally for convenience but are **gitignored**
-and are *not* committed. `corpus/reference-library/README.md` is a citation
-manifest that records each one and where to obtain it. If you make this repository
-private and want the PDFs tracked, remove the matching line from `.gitignore`.
+## How I use AI tools
 
-## Where to start
+Claude and GPT helped me with extraction, review passes and drafting. The logs in `corpus/stage3_evidence_records/WG-01.md` record which passes the LLM reviewer did, and they are signed "Reviewer: Claude". I made the decisions, checked the sources and approved every change, and the code above exists so that the AI output gets checked rather than taken on trust.
 
-New here? Read `paper/02-methodology.md` for the framework and pipeline, then
-`src/README.md` for what each stage does and which parts are still open.
+## Tech stack
+
+Python 3.10+: the standard library, plus PyYAML for Stage 3. `pdftotext` (poppler-utils) for quote verification. Claude Sonnet 5 via claude.ai for the calibration runs. Tests run in GitHub Actions (`.github/workflows/tests.yml`).
+
+## License
+
+The code is under the MIT License (`LICENSE`). The writing, prompts, claim inventory and evidence records are under CC BY 4.0 (`LICENSE-docs.md`). The DGA documents in `corpus/dga/` are U.S. government works in the public domain.
+
+## Author
+
+**Nic DeNoto**, High School Researcher, SUNY Polytechnic Institute. [github.com/nicdenoto](https://github.com/nicdenoto)
