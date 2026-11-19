@@ -1,12 +1,6 @@
 # Pipeline
 
-The audit runs as six stages. Stages 1, 2, 4, 5 and 6 are **structured stubs**; Stage 3
-is a working validator for the EvidenceRecord schema (`schema/evidence-record.md`,
-§1–§11 frozen at revision 7). Each stub marks
-the boundary and responsibility of a stage so the working code can be dropped in
-without losing the stage separation or the provenance control that runs across all
-of them. One stage (stage 5) is still methodologically open (noted below) and
-should not be treated as settled.
+The audit runs as six stages. Two parts are working code: the Stage 3 validator (`stage3_evidence_hierarchy.py`), which checks every EvidenceRecord against the schema in `schema/evidence-record.md` (§1–§11 frozen at revision 7), and the Stage 4 verification layer in `stage4/`. The other stage files (1, 2, 4, 5 and 6) are stubs. They record what each stage is responsible for, so that the boundaries between stages and the provenance tagging stay fixed as I implement them. Stage 5 is still an open design question and shouldn't be treated as settled.
 
 For the authoritative description, see `paper/02-methodology.md`.
 
@@ -40,8 +34,10 @@ For the authoritative description, see `paper/02-methodology.md`.
    the live corpus are trusted (see "LLM calibration" in the Methodology). The
    design-specific instruments (the Cochrane risk-of-bias tools, STROBE, ROBIS,
    AMSTAR-2, CONSORT) are supporting apparatus and are not calibrated this way.
-   Calibration status: the E-value is the prototype and is in progress; the other
-   three follow once it is complete.
+   Calibration status: the E-value is the first framework, and its calibration is in
+   progress; the other three follow once it is complete. The LLM runs are done
+   by hand in an isolated chat project. The code that checks them (calculator,
+   validator, quote verifier and tests) is in `stage4/`; see its README.
 
 5. **`stage5_statistical_evaluation.py` — Statistical evaluation.** A statistical
    system applied across the stored references/sub-references. **Fully open:** its

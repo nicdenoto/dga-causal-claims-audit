@@ -6,7 +6,8 @@ them as Markdown in an organized corpus.
 Collection runs on a custom script and LLM assistance in combination
 (resolved 2026-09-17).
 
-TODO: drop in the working implementation from the local environment.
+Not implemented in this repository yet; see "Project status and limitations" in
+the root README.
 """
 
 

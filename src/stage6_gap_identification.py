@@ -6,7 +6,8 @@ EXISTING mechanistic/anthropological evidence chosen to run contrary to the clai
 (mirroring the beta-carotene precedent). Supplement with omitted evidence; do not
 propose new studies.
 
-TODO: drop in the working implementation from the local environment.
+Not implemented in this repository yet; see "Project status and limitations" in
+the root README.
 """
 
 

@@ -9,7 +9,8 @@ model. For this project, stages 1-2 are fixed to the DGA 2025-2030 corpus.
 
 Provenance: claims enter tagged [T1]/[T2]/[STRUCTURE]; do not conflate tiers.
 
-TODO: drop in the working implementation from the local environment.
+Not implemented in this repository yet; see "Project status and limitations" in
+the root README.
 """
 
 

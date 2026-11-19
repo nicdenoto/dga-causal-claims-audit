@@ -8,7 +8,9 @@ each framework before its judgments on the live corpus are trusted. See the LLM
 calibration subsection in paper/02-methodology.md. Prompts are versioned in
 src/prompts/ (E-value prototype in progress).
 
-TODO: drop in the working implementation from the local environment.
+This module is a stub: the LLM step is currently run by hand in calibration
+chats. The part that is implemented, the verification layer that checks the
+LLM's E-value output, is in src/stage4/.
 """
 
 
