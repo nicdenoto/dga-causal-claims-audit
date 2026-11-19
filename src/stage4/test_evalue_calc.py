@@ -100,3 +100,4 @@ for name, args, labels, num, ci_is_1 in sent_cases:
     print(("PASS" if ok else "FAIL"), "sentence:", name)
 n = len(cases) + len(expansions) + 2 + len(sent_cases)
 print(f"{n-fails}/{n} passed")
+raise SystemExit(1 if fails else 0)

@@ -1,0 +1,24 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r src/requirements.txt
+      - name: Validate the Stage 3 evidence records
+        run: python src/stage3_evidence_hierarchy.py
+      - name: E-value calculator tests
+        working-directory: src/stage4
+        run: python test_evalue_calc.py
+      - name: E-value calculator example
+        working-directory: src/stage4
+        run: python run_example.py example_table.json
