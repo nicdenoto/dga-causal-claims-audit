@@ -1,5 +1,7 @@
 # DGA Causal-Claims Audit
 
+[![tests](https://github.com/nicdenoto/dga-causal-claims-audit/actions/workflows/tests.yml/badge.svg)](https://github.com/nicdenoto/dga-causal-claims-audit/actions/workflows/tests.yml)
+
 I'm building a research pipeline that checks whether the certainty the *2025–2030 Dietary Guidelines for Americans* (DGA) asserts for its causal claims matches the evidence it cites. It combines LLM-applied appraisal frameworks with Python code that checks the LLM's work instead of trusting it.
 
 ## Why
@@ -50,8 +52,8 @@ Every prompt version and the reason for each change are in `src/prompts/` (versi
 You need Python 3.10 or newer. `verify_quotes.py` also needs `pdftotext` (poppler) and a source PDF. The PDFs are copyrighted, so they aren't in the repo.
 
 ```bash
-git clone https://github.com/nicdenoto/United-States-Food-Pyramid.git
-cd United-States-Food-Pyramid
+git clone https://github.com/nicdenoto/dga-causal-claims-audit.git
+cd dga-causal-claims-audit
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r src/requirements.txt
 
