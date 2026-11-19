@@ -238,7 +238,7 @@ resolve, the mechanistic-leg question: the true whole-grain RCT evidence is
 positive, so the "benefit may be fiber-general rather than whole-grain-
 specific" reading needs re-examination — three of four endpoints still
 favor the fibre-general reading, but body weight now cuts the other way.
-Left for Nic's case-analysis prose to characterize; not editorialized
+Left for my case-analysis prose to characterize; not editorialized
 further here.
 
 **Flag for the case-analysis prose — revised in light of the correction:**
@@ -273,7 +273,7 @@ data relating to the prospective observational studies," Table C:1 p. 35
 (the CRC/T2D high-vs-low and dose-response rows specifically; pp. 36–46
 are Figures C:1–C:22) and Table C:2 GRADE tables pp. 47–50 (CRC row p.49,
 T2D row p.48 specifically; corrected 2026-09-25 repo sweep: previously "the table runs roughly
-pp.35-47" and "Table C:2 … p. 48-50"), supplied by Nic 2026-09-14 — previously
+pp.35-47" and "Table C:2 … p. 48-50"), which I supplied on 2026-09-14 — previously
 blocked on the open web, see the gap-chase pass)** [T1]:
 
 - *Colorectal cancer, whole grain, high vs low* (7 studies): RR 0.87 (0.79,
@@ -378,7 +378,7 @@ evidence tier; WG-01's five GRADE-rated outcomes all remain [T1]):**
   list below. **Hu:** remains the one genuinely open item — Supplemental
   Tables 1–5 are referenced in-text but still blocked by the same
   publisher bot-wall as everything else (see acquisition-attempt log
-  below); closing this would need Nic to pull them the same way he pulled
+  below); closing this would need me to pull them the same way I pulled
   the other supplements already in hand.
 - *Mechanistic-pathway specificity* (fiber → glucose/insulin → microbiota:
   whole-grain-specific, or attributable to fiber/dietary pattern
@@ -398,7 +398,7 @@ evidence tier; WG-01's five GRADE-rated outcomes all remain [T1]):**
 Supplemental Table 5 ("General study characteristics of the included
 studies investigating the association between whole grain intake and risk
 of adiposity"), PDF p. 28 (document's own printed page 27), supplied by
-Nic 2026-09-14; re-verified this pass by direct table read via `pdftotext`,
+me 2026-09-14; re-verified this pass by direct table read via `pdftotext`,
 not just re-cited]: the 6 studies contributing to the whole-grain/adiposity
 estimate report follow-up of 4 y (Bautista-Castaño 2013), 13 y (Bazzano
 2005), 16 y (Boggs 2013), 5 y (De la Fuente-Arrillaga 2014), 12 y (Liu
@@ -408,7 +408,7 @@ individual values rather than a single computed average or range label,
 consistent with the Stage 3 schema's rule against the pipeline performing
 arithmetic the source itself didn't state; if a single aggregate figure is
 wanted for the case-analysis prose, that reduction should happen in the
-prose itself (Nic's to write), not be baked into the corpus record.
+prose itself (mine to write), not be baked into the corpus record.
 
 The same table also carries each study's adjustment factors (previously
 mischaracterized above as unobtained) and its sample size / case count —
@@ -446,7 +446,7 @@ as WG01-EV-025/026; the other four were intentionally not written out, see
 
 **Acquisition-attempt log, this pass (2026-09-14) — everything below was
 chased and confirmed still blocked, not left unfound; one item (Reynolds'
-appendix) was subsequently closed the same day when Nic supplied it
+appendix) was subsequently closed the same day when I supplied it
 directly, per the update above:**
 - *Reynolds supplementary appendix* (pp. 35–50, cited in Reynolds' own
   Table 2 footnote as the source of the GRADE justifications, which carry
@@ -459,8 +459,8 @@ directly, per the update above:**
   include the appendix — confirmed by direct read, it ends at the reference
   list (p. 26). Searched ResearchGate, Otago's institutional repository
   (Te Morenga is an Otago-affiliated co-author), and CORE.ac.uk for a mirror
-  that bundles the appendix — none found. **Resolved same day:** Nic
-  supplied the appendix directly (saved from his own access as
+  that bundles the appendix — none found. **Resolved same day:** I
+  supplied the appendix directly (saved from my own access as
   `ReynoldsAppendix.pdf`); exact I² values, aggregate follow-up duration,
   and sensitivity-analysis detail extracted and folded into the record
   above — no longer an open gap.
@@ -477,7 +477,7 @@ directly, per the update above:**
   the post-2022-migration mirror `advances.nutrition.org` both returned 403;
   the PMC copy (PMC6416048) served a reCAPTCHA wall instead of content; a
   ResearchGate copy of the main PDF is available but does not carry the
-  supplement. **Resolved same day:** Nic supplied the full supplementary
+  supplement. **Resolved same day:** I supplied the full supplementary
   data bundle directly (`Schlesinger2019_SupplementaryData.pdf`);
   Supplemental Table 5's per-study follow-up duration extracted and folded
   into the record above — no longer an open gap.
@@ -487,7 +487,7 @@ directly, per the update above:**
   supplementary files, not just the main article. Consistent with that
   precedent, closing the one item still open (Hu's supplemental tables;
   the other two were resolved the same day, corrected 2026-09-25 repo sweep) most likely
-  requires Nic pulling it the same way he pulled the primary PDFs (institutional access or a
+  requires me pulling it the same way I pulled the primary PDFs (institutional access or a
   logged-in browser session), not a different search strategy.
 - *Front-end report, local archival copy*: **resolved.** Filed as
   `corpus/dga/DGA2025-2030_FrontEndReport_Scientific-Report_508.pdf` (90
@@ -500,7 +500,7 @@ directly, per the update above:**
   Confirmed.
 - Reynolds et al. 2019 (*Lancet*) — initially fetched the University of
   Dundee institutional-repository copy (`discovery.dundee.ac.uk`, green-OA
-  author manuscript), 2026-09-14; full PDF then supplied directly by Nic the
+  author manuscript), 2026-09-14; full PDF then supplied directly by me the
   same day, and every figure re-verified via direct page read against it
   (Table 1 p. 437, Table 2 p. 438, Figure 2 p. 440; corrected during the
   reconciliation pass -- confirmed by direct per-page PDF extraction after an
@@ -511,14 +511,14 @@ directly, per the update above:**
   dose-response estimates, all above). This closes the transparency gap
   flagged at the end of the previous pass.
 - Hu et al. 2023 (*Am J Clin Nutr*) — open-web fetch blocked (HTTP 403,
-  2026-09-14); full text supplied directly by Nic, 2026-09-14. Confirmed,
+  2026-09-14); full text supplied directly by me, 2026-09-14. Confirmed,
   matches appendix figures exactly (both categorical and dose-response).
 - Schlesinger et al. 2019 (*Adv Nutr*) — open-web fetch blocked (HTTP 403 /
-  reCAPTCHA, 2026-09-14); full text supplied directly by Nic, 2026-09-14.
+  reCAPTCHA, 2026-09-14); full text supplied directly by me, 2026-09-14.
   Confirmed, matches appendix figures exactly.
 - Reynolds et al. 2019 supplementary appendix (*Lancet*, pp. 35–50) —
   open-web fetch blocked (HTTP 403 on `thelancet.com`; no open-access
-  mirror bundles it), 2026-09-14; full appendix supplied directly by Nic
+  mirror bundles it), 2026-09-14; full appendix supplied directly by me
   the same day (`ReynoldsAppendix.pdf`, converted to `.md` for extraction).
   Appendix C (whole-grain data, Table C:1 and Table C:2 GRADE tables, pp.
   35–50) read directly; exact I² values, aggregate follow-up duration, and

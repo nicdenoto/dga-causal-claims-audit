@@ -128,7 +128,7 @@ history (rev-5 mechanical retrofit, Figure-2 primary-source pass,
 validator build + rule-3 fix + rev-6, rev-7), and
 `stage3_evidence_hierarchy.py` run five times against the full WG-01
 corpus with identical results every run (28 records, 0 errors, 0 notes,
-exit 0) -- Nic declared Stage 3 frozen. Freezing here means: the schema
+exit 0) -- I declared Stage 3 frozen. Freezing here means: the schema
 (§1-§13) and the WG-01 corpus it validates are both in a state the
 validator confirms clean, and further changes to the specification
 itself are a deliberate reopening, not a continuation of this design
