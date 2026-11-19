@@ -1,7 +1,4 @@
-# Pin these to the versions actually used, for replicability.
-# (Placeholder — fill in from the local environment.)
-# requests
-# beautifulsoup4
-# anthropic
-# pandas
-pyyaml>=6.0   # required by stage3_evidence_hierarchy.py
+# Runtime dependencies. Everything else is the Python standard library.
+pyyaml>=6.0,<7      # stage3_evidence_hierarchy.py parses EvidenceRecords
+# verify_quotes.py also needs the `pdftotext` command-line tool (poppler-utils),
+# which pip does not install: `brew install poppler` or `apt install poppler-utils`.
